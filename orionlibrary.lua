@@ -40,7 +40,8 @@ end)
 
 if not Success then
 	warn("\nOrion Library - Failed to load Feather Icons. Error code: " .. Response .. "\n")
-end	
+
+end
 
 local function GetIcon(IconName)
 	if Icons[IconName] ~= nil then
@@ -706,6 +707,7 @@ function OrionLib:MakeWindow(WindowConfig)
 			Position = UDim2.new(0, 25, 0, 15)
 		})
 		WindowIcon.Parent = MainWindow.TopBar
+
 
 		end
 
