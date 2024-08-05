@@ -508,16 +508,17 @@ function OrionLib:MakeWindow(WindowConfig)
 		end	
 	end
 
-	local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {
+	local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4),
 		WindowConfig.SearchBar and {
 			Size = UDim2.new(1, 0, 1, -90),
 			Position = UDim2.new(0, 0, 0, 40)
 		} or {
-		Size = UDim2.new(1, 0, 1, -50)
-	}), {
-		MakeElement("List"),
-		MakeElement("Padding", 8, 0, 0, 8)
-	}), "Divider")
+			Size = UDim2.new(1, 0, 1, -50)
+		}),
+		{
+			MakeElement("List"),
+			MakeElement("Padding", 8, 0, 0, 8)
+		}), "Divider")
 
 	AddConnection(TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
 		TabHolder.CanvasSize = UDim2.new(0, 0, 0, TabHolder.UIListLayout.AbsoluteContentSize.Y + 16)
@@ -705,7 +706,8 @@ function OrionLib:MakeWindow(WindowConfig)
 			Position = UDim2.new(0, 25, 0, 15)
 		})
 		WindowIcon.Parent = MainWindow.TopBar
-	end	
+
+		end
 
 	MakeDraggable(DragPoint, MainWindow)
 
@@ -1773,10 +1775,12 @@ function OrionLib:MakeWindow(WindowConfig)
 			})
 		end
 		return ElementFunction   
-	end  
-	
-	
 
+
+
+	
+	
+		end
 	
 	return TabFunction
 end   
