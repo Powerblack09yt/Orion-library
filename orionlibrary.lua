@@ -7,6 +7,10 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
+
+local PARENT = (gethui and gethui()) or game:GetService('CoreGui')
+
+
 local OrionLib = {
 	Elements = {},
 	ThemeObjects = {},
@@ -48,33 +52,17 @@ end
 
 local Orion = Instance.new("ScreenGui")
 Orion.Name = "Orion"
-if syn then
-	syn.protect_gui(Orion)
-	Orion.Parent = game.CoreGui
-else
-	Orion.Parent = gethui() or game.CoreGui
+Orion.Parent = PARENT
 end
 
-if gethui then
-	for _, Interface in ipairs(gethui():GetChildren()) do
-		if Interface.Name == Orion.Name and Interface ~= Orion then
-			Interface:Destroy()
-		end
-	end
-else
-	for _, Interface in ipairs(game.CoreGui:GetChildren()) do
-		if Interface.Name == Orion.Name and Interface ~= Orion then
-			Interface:Destroy()
-		end
+for _, Interface in ipairs(PARENT:GetChildren()) do
+	if Interface.Name == Orion.Name and Interface ~= Orion then
+		Interface:Destroy()
 	end
 end
 
 function OrionLib:IsRunning()
-	if gethui then
-		return Orion.Parent == gethui()
-	else
-		return Orion.Parent == game:GetService("CoreGui")
-	end
+	return Orion.Parent == PARENT
 
 end
 
@@ -86,6 +74,9 @@ local function AddConnection(Signal, Function)
 	table.insert(OrionLib.Connections, SignalConnect)
 	return SignalConnect
 end
+
+
+
 
 task.spawn(function()
 	while (OrionLib:IsRunning()) do
@@ -145,6 +136,18 @@ local function CreateElement(ElementName, ElementFunction)
 	end
 end
 
+local function AddItemTable(Table, Item, Value)
+	local Item = tostring(Item)
+	local Count = 1
+
+	while Table[Item] do
+		Count = Count + 1
+		Item = string.format('%s-%d', Item, Count)
+	end
+
+	Table[Item] = Value
+end
+
 local function MakeElement(ElementName, ...)
 	local NewElement = OrionLib.Elements[ElementName](...)
 	return NewElement
@@ -155,9 +158,18 @@ local function SetProps(Element, Props)
 		Element[Property] = Value
 	end)
 	return Element
+
 end
 
+local Total = {
+	SetChildren = 0;
+	AddThemeObject = 0;
+};
+
 local function SetChildren(Element, Children)
+	Total.SetChildren += 1;
+	--print(Element, Children, Total.SetChildren)
+	--print(`[{Total.SetChildren}] Added on "SetChildren": {Element}, {Children}`)
 	table.foreach(Children, function(_, Child)
 		Child.Parent = Element
 	end)
@@ -192,6 +204,9 @@ local function AddThemeObject(Object, Type)
 	if not OrionLib.ThemeObjects[Type] then
 		OrionLib.ThemeObjects[Type] = {}
 	end    
+	Total.AddThemeObject += 1;
+	--print(Object, Type)
+	--print(`[{Total.AddThemeObject}] Added on "AddThemeObject": {Object}, {Type}`)
 	table.insert(OrionLib.ThemeObjects[Type], Object)
 	Object[ReturnProperty(Object)] = OrionLib.Themes[OrionLib.SelectedTheme][Type]
 	return Object
@@ -659,13 +674,7 @@ function OrionLib:MakeWindow(WindowConfig)
 		Size = UDim2.new(0, 615, 0, 344),
 		ClipsDescendants = true
 	}), {
-		--SetProps(MakeElement("Image", "rbxassetid://3523728077"), {
-		--	AnchorPoint = Vector2.new(0.5, 0.5),
-		--	Position = UDim2.new(0.5, 0, 0.5, 0),
-		--	Size = UDim2.new(1, 80, 1, 320),
-		--	ImageColor3 = Color3.fromRGB(33, 33, 33),
-		--	ImageTransparency = 0.7
-		--}),
+	
 		SetChildren(SetProps(MakeElement("TFrame"), {
 			Size = UDim2.new(1, 0, 0, 50),
 			Name = "TopBar"
@@ -800,6 +809,8 @@ function OrionLib:MakeWindow(WindowConfig)
 				Name = "Title"
 			}), "Text")
 		})
+
+		AddItemTable(Tabs, TabConfig.Name, TabFrame)
 
 		if GetIcon(TabConfig.Icon) ~= nil then
 			TabFrame.Ico.Image = GetIcon(TabConfig.Icon)
